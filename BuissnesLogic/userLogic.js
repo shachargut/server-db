@@ -1,12 +1,49 @@
-// require('../DataAcsesLayer/db').connect()
-// const userController = require('../DataAcsesLayer/controlers/userController')
-// async function getUserDetailsById(id){
+const userController = require('../DataAcsesLayer/controlers/userController')
+const {createToken} = require('./jwt')
+const { use } = require('../Routs')
 
-// }
-// module.exports function getAllUsers = ()=>{
-//     userController.read({})
-// }
-// async function register(){
+exports.getAllUsers=async()=>{
+    const users = await userController.read({},"address firstName")
+    if(users.length === 0){
+        throw {code:400,massage:"there is no massage"}
+    }else{return users}
+}
+exports.getUserDetailByid=  async (id)=>{
+    const users = await userController.read({_id:id})
+    if(!users.length){
+        throw {code:404,massage:"there is no users by this ID"}
+    }else{
+        return users
+    }
+}
+exports.register = async (userField)=>{
+    const eUser = await userController.read({email: userField.email})
+    if(eUser.length){throw({code:400,massage:"this email already exist"})}
+    return await userController.create(userField)
+}
+exports.createUser = async (userField)=>{
+    const eUser = await userController.read({email: userField.email})
+    if(eUser.length){throw({})}
+    return await userController.create(userField)
+}
+exports.login = async(email,password)=>{
+    //validate - basic
+    if(!email||!password){throw({code:409,message:"missing data"})}
+    //user exist?
+    const eUser = await userController.read({email},"+password")
+    console.log(eUser);
+    if(eUser.length == 0) throw({code:404,message:"user not found"})
+    //password match?
+    if(password!==eUser[0].password) throw ({code:503,message:"not auth"})
+    return createToken(eUser[0]._id)
+}
+exports.updateUser = async(id, newFieled)=>{
+    const users = await userController.read({_id:id})
+    if(!users.length){ throw {code:404,massage:"there is no users by this ID (put)"}}
+    else{
+   return userController.update({_id:id},newFieled)
+    }
+}
 
 // }
 // let user1={
