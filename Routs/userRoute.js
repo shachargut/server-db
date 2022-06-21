@@ -7,7 +7,7 @@
 // })
 // const rou
 module.exports = (req, res) => {
-    res.send("testI")
+    res.send("HELLO WORLD")
 }
 // const userLogic = require('../BL/userLogic')
 
